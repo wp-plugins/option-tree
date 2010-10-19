@@ -38,7 +38,7 @@ $ot_admin = new OT_Admin();
  * @uses register_activation_hook()
  * @uses register_deactivation_hook()
  *
- * @since 1.0
+ * @since 1.0.0
  */
 register_activation_hook( __FILE__, array( $ot_admin, 'option_tree_activate' ) );
 register_deactivation_hook( __FILE__, array( $ot_admin, 'option_tree_deactivate' ) );
@@ -48,7 +48,7 @@ register_deactivation_hook( __FILE__, array( $ot_admin, 'option_tree_deactivate'
  *
  * @uses add_action()
  *
- * @since 1.0
+ * @since 1.0.0
  */
 add_action( 'init', array( $ot_admin, 'create_option_post' ), 5 );
 add_action( 'admin_init', array( $ot_admin, 'option_tree_init' ) );
