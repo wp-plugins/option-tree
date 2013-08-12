@@ -3,7 +3,7 @@
  * Plugin Name: OptionTree
  * Plugin URI:  http://wp.envato.com
  * Description: Theme Options UI Builder for WordPress. A simple way to create & save Theme Options and Meta Boxes for free or premium themes.
- * Version:     2.1.2
+ * Version:     2.1.3
  * Author:      Derek Herman
  * Author URI:  http://valendesigns.com
  * License:     GPLv3
@@ -32,21 +32,85 @@ if ( ! class_exists( 'OT_Loader' ) ) {
      */
     public function __construct() {
       
+      /* load languages */
+      $this->load_languages();
+      
       /* load OptionTree */
-      add_action('init', array( $this, 'load' ), 1 );
+      add_action( 'after_setup_theme', array( $this, 'load_option_tree' ), 1 );
+      
+    }
+    
+    /**
+     * Load the languages before everything else.
+     *
+     * @return    void
+     *
+     * @access    private
+     * @since     2.1.3
+     */
+    private function load_languages() {
+    
+      /**
+       * A quick check to see if we're in plugin mode.
+       *
+       * @since     2.1.3
+       */
+      define( 'OT_PLUGIN_MODE', strpos( dirname( __FILE__ ), 'plugins/' . basename( dirname( __FILE__ ) ) ) !== false ? true : false );
+      
+      /**
+       * Path to the languages directory. 
+       *
+       * This path will be relative in plugin mode and absolute in theme mode.
+       *
+       * @since     2.0.10
+       */
+      define( 'OT_LANG_DIR', dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+      /* load the text domain  */
+      if ( OT_PLUGIN_MODE ) {
+      
+        add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+        
+      } else {
+      
+        add_action( 'after_setup_theme', array( $this, 'load_textdomain' ) );
+        
+      }
+      
+    }
+    
+    /**
+     * Load the text domain.
+     *
+     * @return    void
+     *
+     * @access    private
+     * @since     2.0
+     */
+    public function load_textdomain() {
+    
+      if ( OT_PLUGIN_MODE ) {
+      
+        load_plugin_textdomain( 'option-tree', false, OT_LANG_DIR );
+        
+      } else {
+      
+        load_theme_textdomain( 'option-tree', OT_LANG_DIR . 'theme-mode' );
+        
+      }
       
     }
     
     /** 
-     * Load OptionTree on the 'init' action. Then filters will be availble 
-     * to the theme, and not only when in Theme Mode.
+     * Load OptionTree on the 'after_setup_theme' action. Then filters will 
+     * be availble to the theme, and not only when in Theme Mode.
      *
      * @return    void
      *
      * @access    public
-     * @since     @todo
+     * @since     2.1.2
      */
-    public function load() {
+    public function load_option_tree() {
     
       /* setup the constants */
       $this->constants();
@@ -61,7 +125,7 @@ if ( ! class_exists( 'OT_Loader' ) ) {
       $this->hooks();
       
     }
-    
+
     /**
      * Constants
      *
@@ -78,7 +142,7 @@ if ( ! class_exists( 'OT_Loader' ) ) {
       /**
        * Current Version number.
        */
-      define( 'OT_VERSION', '2.1.2' );
+      define( 'OT_VERSION', '2.1.3' );
       
       /**
        * For developers: Allow Unfiltered HTML in all the textareas.
@@ -228,12 +292,6 @@ if ( ! class_exists( 'OT_Loader' ) ) {
         define( 'OT_THEME_URL', get_template_directory_uri() );
       }
       
-      /**
-       * Relative path to the languages directory.
-       *
-       * @since     2.0.10
-       */
-      define( 'OT_LANG_DIR', dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
     }
     
     /**
@@ -320,14 +378,7 @@ if ( ! class_exists( 'OT_Loader' ) ) {
      * @since     2.0
      */
     private function hooks() {
-      
-      /* load the text domain  */
-      if ( false == OT_THEME_MODE && false == OT_CHILD_THEME_MODE ) {
-        add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
-      } else {
-        add_action( 'after_setup_theme', array( $this, 'load_textdomain' ) );
-      }
-      
+
       /* load the Meta Box assets */
       if ( OT_META_BOXES == true ) {
       
@@ -415,22 +466,6 @@ if ( ! class_exists( 'OT_Loader' ) ) {
       
       include_once( $file );
       
-    }
-    
-    /**
-     * Load the text domain.
-     *
-     * @return    void
-     *
-     * @access    private
-     * @since     2.0
-     */
-    public function load_textdomain() {
-      if ( false == OT_THEME_MODE && false == OT_CHILD_THEME_MODE ) {
-        load_plugin_textdomain( 'option-tree', false, OT_LANG_DIR . 'plugin' );
-      } else {
-        load_theme_textdomain( 'option-tree', OT_LANG_DIR . 'theme-mode' );
-      }
     }
     
     /**
